@@ -10,10 +10,13 @@ public:
   float _mass;
   Color _color;
 
-  Planet(Vector3 pos, float radius, float mass, Color color = RAYWHITE)
-            : _pos(pos), _radius(radius), _mass(mass), _color(color) {}
+  Planet(Vector3 pos, float radius, float mass, Texture texture, Color color = RAYWHITE);
 
   void update();
   void draw();
+
+private:
+    Mesh _mesh;
+    Material _material;
 
 };

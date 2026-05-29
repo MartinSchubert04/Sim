@@ -1,11 +1,13 @@
 #include "Application.h"
+#include "CameraController.h"
+#include "Planet.h"
 
 Application *Application::instance = nullptr;
 
 Application *createApplication() { return new Application();}
 
 Application::Application() {
-    instance = createApplication();
+    instance = this;
 
     InitWindow(0,0, "Pong");
     InitAudioDevice();
@@ -24,6 +26,11 @@ void Application::run() {
     camera.fovy = 45.0f;                                          // Camera field-of-view Y
     camera.projection = CAMERA_PERSPECTIVE;                       // Camera mode type
 
+    auto cameraController = CameraController();
+
+    Texture t = LoadTexture("textures/earth/colormap.jpg");
+    auto planet = Planet({0,0,0}, .5f, 1.f, t);
+
     while(!WindowShouldClose()) {
         auto time = (float)GetTime();
         dt = time - _lastTime;
@@ -32,7 +39,12 @@ void Application::run() {
         BeginDrawing();
           BeginMode3D(camera);
 
+            // updates
+            cameraController.update(camera);
+
+            // draw
             DrawGrid(10, 1.0f);
+            planet.draw();
 
 
             DrawText("Hello world", (int)(_window.x / 2/ 2), _window.y / 2, 20, {245, 245, 245, 80});

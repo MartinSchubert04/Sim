@@ -2,7 +2,7 @@
 #include "Sim/Application.h"
 
 int main() {
-  auto *app = Application::get();
+  auto *app = createApplication();
 
   app->run();
 
