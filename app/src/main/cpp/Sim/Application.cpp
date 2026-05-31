@@ -33,7 +33,7 @@ void Application::run() {
     auto cameraController = CameraController();
 
     Texture t = LoadTexture("textures/earth/colormap90.png");
-    auto planet = Planet({0,0,0}, .5f, 1.f, t);
+    auto planet = Planet({0,0,-1.5f}, .5f, 1.f, t);
 
     while(!WindowShouldClose()) {
         auto time = (float)GetTime();
@@ -64,6 +64,8 @@ void Application::run() {
           Renderer::DrawLabel("Y", {0,2.2f,0}, 25.f, camera, GREEN);
           Renderer::DrawLabel("Z", {0,0,2.2f}, 25.f, camera, BLUE);
 
-        EndDrawing();
+          Renderer::DrawLabel("Earth", Vector3Add(planet._pos, {0,planet._radius + 0.2f,0}), 35.f, camera, RAYWHITE);
+
+      EndDrawing();
     }
 }

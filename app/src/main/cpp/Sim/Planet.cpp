@@ -27,8 +27,19 @@ void Planet::update(DeltaTime dt) {
   Matrix rotation   = MatrixRotateY(DEG2RAD * _rotationAngle);
 
   _model.transform = MatrixMultiply(correction, rotation);
+
+  orbit(dt);
+
 }
 
 void Planet::draw() {
   DrawModel(_model, _pos, 1.f, _color);
+}
+
+void Planet::orbit(DeltaTime dt) {
+  _orbitAngle += dt.getSeconds() * _orbitSpeed;
+
+  _pos.x = _orbitRadius * cosf(_orbitAngle);
+  _pos.z = _orbitRadius * sinf(_orbitAngle);
+  // _pos.y queda fijo (órbita en plano horizontal)
 }
