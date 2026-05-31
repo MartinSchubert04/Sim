@@ -1,4 +1,3 @@
-#include "raymob.h"
 #include "Sim/Application.h"
 
 int main() {

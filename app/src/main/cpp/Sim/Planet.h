@@ -1,22 +1,25 @@
 #pragma once
 
 #include "pch.h"
+#include "DeltaTime.h"
 
 class Planet {
 
 public:
-  Vector3 _pos;
-  float _radius;
-  float _mass;
-  Color _color;
+    Vector3 _pos;
+    float _radius;
+    float _mass;
+    Color _color;
 
-  Planet(Vector3 pos, float radius, float mass, Texture texture, Color color = RAYWHITE);
+    Planet(Vector3 pos, float radius, float mass, Texture texture, Color color = RAYWHITE);
+    ~Planet();
 
-  void update();
-  void draw();
+    void update(DeltaTime dt);
+    void draw();
 
 private:
-    Mesh _mesh;
+    Model _model;
     Material _material;
+    float _rotationAngle = 0.f;
 
 };

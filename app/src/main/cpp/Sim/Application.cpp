@@ -1,6 +1,8 @@
 #include "Application.h"
 #include "CameraController.h"
 #include "Planet.h"
+#include "Renderer.h"
+#include "Global.h"
 
 Application *Application::instance = nullptr;
 
@@ -15,6 +17,8 @@ Application::Application() {
     EnableSensor(SENSOR_ACCELEROMETER);
 
     _window = {(float)GetScreenWidth(), (float)GetScreenHeight()};
+
+    Global::instance().init();
 }
 
 
@@ -28,7 +32,7 @@ void Application::run() {
 
     auto cameraController = CameraController();
 
-    Texture t = LoadTexture("textures/earth/colormap.jpg");
+    Texture t = LoadTexture("textures/earth/colormap90.png");
     auto planet = Planet({0,0,0}, .5f, 1.f, t);
 
     while(!WindowShouldClose()) {
@@ -41,15 +45,25 @@ void Application::run() {
 
             // updates
             cameraController.update(camera);
+            planet.update(dt);
 
             // draw
             DrawGrid(10, 1.0f);
+
             planet.draw();
 
-
-            DrawText("Hello world", (int)(_window.x / 2/ 2), _window.y / 2, 20, {245, 245, 245, 80});
+            // axis x = red, y = green, blue = z
+            Renderer::DrawArrow({0,0,0}, {2,0,0}, 0.01f, 0.1, 8, RED);
+            Renderer::DrawArrow({0,0,0}, {0,2,0}, 0.01f, 0.1, 8, GREEN);
+            Renderer::DrawArrow({0,0,0}, {0,0,2}, 0.01f, 0.1, 8, BLUE);
 
           EndMode3D();
+
+          // text camera fixed
+          Renderer::DrawLabel("X", {2.2f,0,0}, 25.f,camera, RED);
+          Renderer::DrawLabel("Y", {0,2.2f,0}, 25.f, camera, GREEN);
+          Renderer::DrawLabel("Z", {0,0,2.2f}, 25.f, camera, BLUE);
+
         EndDrawing();
     }
 }
