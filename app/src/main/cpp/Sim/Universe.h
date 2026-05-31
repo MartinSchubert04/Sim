@@ -1,16 +1,28 @@
 #pragma once
 
+#include "pch.h"
+#include "Planet.h"
+
 class Universe {
 
-private:
-    Universe() {}
-
 public:
+  static float G;
 
-    static Universe *get() { return instance; }
+  Universe() = default;
+  void update(DeltaTime dt);
+  void draw();
+
+  void add(Planet &p) { entities.push_back(p); }
+  void setStar(Planet &s) { sun = s; }
 
 private:
-    static Universe *instance;
+  void updateOrbits(DeltaTime dt);
+
+
+private:
+  std::vector<Planet> entities;
+  Planet sun;
+
 };
 
 

@@ -8,12 +8,14 @@ class Planet {
 public:
     Vector3 _pos;
     float _radius;
+    Vector3 _speed;
     float _mass;
     Color _color;
     float _orbitAngle = 0.f;
     float _orbitRadius = 1.5f;
     float _orbitSpeed = 1.f;
 
+    Planet() = default;
     Planet(Vector3 pos, float radius, float mass, Texture texture, Color color = RAYWHITE);
     ~Planet();
 
