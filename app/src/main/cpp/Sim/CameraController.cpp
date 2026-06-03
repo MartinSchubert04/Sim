@@ -1,6 +1,9 @@
 #include "CameraController.h"
 
 void CameraController::update(Camera3D &camera) {
+  if (_planetFocus != nullptr)
+    camera.target = _planetFocus->_pos;
+
   if (GetTouchPointCount() == 0) {
     _touching = false;
     _lastPinchDist = 0.f;
@@ -13,12 +16,19 @@ void CameraController::update(Camera3D &camera) {
     return;
   }
 
+  if (GetTouchPointCount() > 0) {
+    if (!_touching) {
+      handlePlanetSelection(camera);
+    }
+  }
+
   handleMovement(camera);
   _touching = true;
 }
 
+Vector2 CameraController::getTouch() { return {(float)GetTouchX(), (float)GetTouchY() }; }
 Vector2 CameraController::getTouchDelta() {
-  Vector2 pos = {(float) GetTouchX(), (float) GetTouchY()};
+  Vector2 pos = getTouch();
   Vector2 delta = {pos.x - _lastPos.x, pos.y - _lastPos.y};
   _lastPos = pos;
   return delta;
@@ -65,3 +75,24 @@ void CameraController::handleZoom(Camera3D &camera) {
 
   _lastPinchDist = dist;
 }
+
+void CameraController::handlePlanetSelection(Camera3D &camera) {
+  Vector2 touch = getTouch();
+
+  Ray  ray = GetScreenToWorldRay(getTouch(), camera);
+
+  for (auto &e : Universe::getEntities()) {
+      auto collision = GetRayCollisionSphere(ray, e._pos, e._radius);
+      if(collision.hit) {
+        _planetFocus = &e;
+        break;
+      }
+  }
+
+  // check for sun
+  RayCollision colSun = GetRayCollisionSphere(ray, Universe::getStar()._pos, Universe::getStar()._radius);
+  if (colSun.hit) {
+    _planetFocus = &Universe::getStar();
+  }
+}
+

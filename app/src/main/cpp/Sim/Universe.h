@@ -13,6 +13,16 @@ public:
   void draw();
 
   void add(Planet &p) { entities.push_back(p); }
+
+  Planet &getEntity(std::string name) {
+    for (auto &e : entities) {
+      if (e._name == name) return e;
+    }
+    throw std::runtime_error("Planet not found");
+  }
+  static Planet &getStar() { return sun; }
+  static std::vector<Planet> &getEntities() { return entities; }
+
   void setStar(Planet &s) { sun = s; }
 
 private:
@@ -20,9 +30,8 @@ private:
 
 
 private:
-  std::vector<Planet> entities;
-  Planet sun;
-
+  static std::vector<Planet> entities;
+  static Planet sun;
 };
 
 

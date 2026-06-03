@@ -6,6 +6,7 @@
 class Planet {
 
 public:
+    std::string _name;
     Vector3 _pos;
     float _radius;
     Vector3 _speed;
@@ -16,7 +17,7 @@ public:
     float _orbitSpeed = 1.f;
 
     Planet() = default;
-    Planet(Vector3 pos, float radius, float mass, Texture texture, Color color = RAYWHITE);
+    Planet(std::string name, Vector3 pos, float radius, float mass, Texture texture, Color color = RAYWHITE);
     ~Planet();
 
     void update(DeltaTime dt);

@@ -1,6 +1,8 @@
 #include "Universe.h"
 
 float Universe::G = 1.0f;
+std::vector<Planet> Universe::entities {};
+Planet Universe::sun {};
 
 void Universe::update(DeltaTime dt) {
   updateOrbits(dt);

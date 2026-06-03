@@ -27,7 +27,7 @@ void Application::run() {
 
     // Camera setup
     Camera3D camera = { 0 };
-    camera.position = (Vector3){ 0.0f, 10.0f, 15.0f };  // Camera position
+    camera.position = (Vector3){ 0.0f, 10.0f, 80.0f };  // Camera position
     camera.target = (Vector3){ 0.0f, 0.0f, 0.0f };      // Camera looking at point
     camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };          // Camera up vector (rotation towards target)
     camera.fovy = 45.0f;                                          // Camera field-of-view Y
@@ -39,9 +39,9 @@ void Application::run() {
     Universe universe;
 
     Texture t = LoadTexture("textures/earth/colormap90.png");
-    auto earth = Planet({0,0,-1.5f}, .5f, 1.f, t);
+    auto earth = Planet("Earth", {0,0,-15.5f}, 1.f, 1.f, t);
     Texture sunT = LoadTexture("textures/sun/sunmap.jpg");
-    auto sun = Planet({0,0,0}, .5f, 1.f, sunT);
+    auto sun = Planet("Sun", {0,0,0}, 10.f, 100.f, sunT);
 
     float r = Vector3Distance(sun._pos, earth._pos);
     float v = sqrt(Universe::G * sun._mass / r);
@@ -50,12 +50,14 @@ void Application::run() {
     universe.add(earth);
     universe.setStar(sun);
 
+
     while(!WindowShouldClose()) {
         auto time = (float)GetTime();
         dt = time - _lastTime;
         _lastTime = time;
 
         BeginDrawing();
+          ClearBackground(BLACK);
           BeginMode3D(camera);
 
             // updates
@@ -63,9 +65,7 @@ void Application::run() {
             universe.update(dt);
 
             // draw
-
             DrawGrid(10, 1.0f);
-
             universe.draw();
 
             // axis x = red, y = green, blue = z
@@ -80,7 +80,11 @@ void Application::run() {
           Renderer::DrawLabel("Y", {0,2.2f,0}, 25.f, camera, GREEN);
           Renderer::DrawLabel("Z", {0,0,2.2f}, 25.f, camera, BLUE);
 
-          Renderer::DrawLabel("Earth", Vector3Add(earth._pos, {0,earth._radius + 0.2f,0}), 35.f, camera, RAYWHITE);
+          auto &e = universe.getEntity("Earth");
+          Renderer::DrawLabel(e._name.c_str(), Vector3Add(e._pos, {0,e._radius + 0.2f,0}), 35.f, camera, RAYWHITE);
+
+          auto &s = universe.getStar();
+          Renderer::DrawLabel(s._name.c_str(), Vector3Add(s._pos, {0,s._radius + 0.2f,0}), 35.f, camera, RAYWHITE);
 
           DrawText(std::to_string(GetFPS()).c_str(), 50, 30, 40, RAYWHITE);
 

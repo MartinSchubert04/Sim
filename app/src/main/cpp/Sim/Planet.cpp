@@ -1,7 +1,7 @@
 #include "Planet.h"
 
-Planet::Planet(Vector3 pos, float radius, float mass, Texture texture, Color color)
-                      :  _pos(pos), _radius(radius), _mass(mass), _color(color), _speed({0,0,0}) {
+Planet::Planet(std::string name, Vector3 pos, float radius, float mass, Texture texture, Color color)
+                      :  _name(name), _pos(pos), _radius(radius), _mass(mass), _color(color), _speed({0,0,0}) {
 
   Mesh mesh = GenMeshSphere(_radius, 32, 32);
   _model = LoadModelFromMesh(mesh);
