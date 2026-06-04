@@ -4,6 +4,7 @@
 #include "Renderer.h"
 #include "Global.h"
 #include "Universe.h"
+#include "rlgl.h"
 
 Application *Application::instance = nullptr;
 
@@ -32,6 +33,8 @@ void Application::run() {
     camera.up = (Vector3){ 0.0f, 1.0f, 0.0f };          // Camera up vector (rotation towards target)
     camera.fovy = 45.0f;                                          // Camera field-of-view Y
     camera.projection = CAMERA_PERSPECTIVE;                       // Camera mode type
+
+    rlSetClipPlanes(1.f, 40000.0);
 
     auto cameraController = CameraController();
 
@@ -65,7 +68,10 @@ void Application::run() {
             universe.update(dt);
 
             // draw
-            DrawGrid(10, 1.0f);
+            rlPushMatrix();
+              rlTranslatef(0, -12.0f, 0);
+              DrawGrid(40, 2.0f);
+            rlPopMatrix();
             universe.draw();
 
             // axis x = red, y = green, blue = z
@@ -81,10 +87,10 @@ void Application::run() {
           Renderer::DrawLabel("Z", {0,0,2.2f}, 25.f, camera, BLUE);
 
           auto &e = universe.getEntity("Earth");
-          Renderer::DrawLabel(e._name.c_str(), Vector3Add(e._pos, {0,e._radius + 0.2f,0}), 35.f, camera, RAYWHITE);
+          Renderer::DrawLabel(e._name.c_str(), Vector3Add(e._pos, {0,e._radius + e._radius *.4f,0}), 35.f, camera, RAYWHITE);
 
           auto &s = universe.getStar();
-          Renderer::DrawLabel(s._name.c_str(), Vector3Add(s._pos, {0,s._radius + 0.2f,0}), 35.f, camera, RAYWHITE);
+          Renderer::DrawLabel(s._name.c_str(), Vector3Add(s._pos, {0,s._radius + s._radius *.2f,0}), 35.f, camera, RAYWHITE);
 
           DrawText(std::to_string(GetFPS()).c_str(), 50, 30, 40, RAYWHITE);
 

@@ -67,10 +67,11 @@ void CameraController::handleZoom(Camera3D &camera) {
 
   if (_lastPinchDist != 0.f) {
     float delta = dist - _lastPinchDist;
+    float zoomScale = 0.04f;
 
     // Mover la cámara hacia/desde el target
     Vector3 dir = Vector3Normalize(Vector3Subtract(camera.position, camera.target));
-    camera.position = Vector3Add(camera.position, Vector3Scale(dir, -delta * 0.01f));
+    camera.position = Vector3Add(camera.position, Vector3Scale(dir, -delta * zoomScale));
   }
 
   _lastPinchDist = dist;
@@ -85,7 +86,7 @@ void CameraController::handlePlanetSelection(Camera3D &camera) {
       auto collision = GetRayCollisionSphere(ray, e._pos, e._radius);
       if(collision.hit) {
         _planetFocus = &e;
-        break;
+        return;
       }
   }
 
