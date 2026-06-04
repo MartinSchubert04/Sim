@@ -4,26 +4,30 @@ void CameraController::update(Camera3D &camera) {
   if (_planetFocus != nullptr)
     camera.target = _planetFocus->_pos;
 
-  if (GetTouchPointCount() == 0) {
-    _touching = false;
-    _lastPinchDist = 0.f;
-    return;
+  int touches = GetTouchPointCount();
+  TouchState state = touches == 0 ? TouchState::Idle
+                   : touches == 1 ? TouchState::Orbiting
+                                  : TouchState::Zooming;
+
+  if (state != _lastState && state == TouchState::Orbiting) {
+    handlePlanetSelection(camera);  // solo en el primer frame de touch
   }
 
-  if (GetTouchPointCount() >= 2) {
-    _touching = false;
-    handleZoom(camera);
-    return;
+  switch (state) {
+    case TouchState::Idle:   _touching = false; _lastPinchDist = 0.f; break;
+
+    case TouchState::Orbiting:
+      handleMovement(camera);
+      _touching = true;
+      break;
+
+    case TouchState::Zooming:
+      handleZoom(camera);
+      _touching = false;
+      break;
   }
 
-  if (GetTouchPointCount() > 0) {
-    if (!_touching) {
-      handlePlanetSelection(camera);
-    }
-  }
-
-  handleMovement(camera);
-  _touching = true;
+  _lastState = state;
 }
 
 Vector2 CameraController::getTouch() { return {(float)GetTouchX(), (float)GetTouchY() }; }
@@ -55,11 +59,6 @@ void CameraController::handleMovement(Camera3D &camera) {
 }
 
 void CameraController::handleZoom(Camera3D &camera) {
-  if (GetTouchPointCount() < 2) {
-    _lastPinchDist = 0.f;
-    return;
-  }
-
   Vector2 p1 = GetTouchPosition(0);
   Vector2 p2 = GetTouchPosition(1);
 

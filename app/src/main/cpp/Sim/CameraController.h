@@ -6,6 +6,8 @@
 
 class CameraController {
 
+enum class TouchState { Idle, Orbiting, Zooming };
+
 public:
     CameraController() = default;
     void update(Camera3D &camera);
@@ -23,4 +25,5 @@ private:
     b32 _touching = false;
     float _lastPinchDist;
     Planet *_planetFocus = nullptr;
+    TouchState _lastState = TouchState::Idle;
 };
