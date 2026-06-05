@@ -18,9 +18,9 @@ Application::Application() {
     InitSensorManager();
     EnableSensor(SENSOR_ACCELEROMETER);
 
-    _window = {(float)GetScreenWidth(), (float)GetScreenHeight()};
+  _window = {(float)GetScreenWidth(), (float)GetScreenHeight()};
 
-    Global::instance().init();
+  Global::instance().init();
 }
 
 
@@ -68,29 +68,21 @@ void Application::run() {
             universe.update(dt);
 
             // draw
-            rlPushMatrix();
-              rlTranslatef(0, -12.0f, 0);
-              DrawGrid(40, 2.0f);
-            rlPopMatrix();
+            Renderer::drawGrid({0, -12.f, 0}, 40, 2.0f, 0.2f, 1.f);
             universe.draw();
-
-            // axis x = red, y = green, blue = z
-            Renderer::DrawArrow({0,0,0}, {2,0,0}, 0.01f, 0.1, 8, RED);
-            Renderer::DrawArrow({0,0,0}, {0,2,0}, 0.01f, 0.1, 8, GREEN);
-            Renderer::DrawArrow({0,0,0}, {0,0,2}, 0.01f, 0.1, 8, BLUE);
 
           EndMode3D();
 
           // text camera fixed
-          Renderer::DrawLabel("X", {2.2f,0,0}, 25.f,camera, RED);
-          Renderer::DrawLabel("Y", {0,2.2f,0}, 25.f, camera, GREEN);
-          Renderer::DrawLabel("Z", {0,0,2.2f}, 25.f, camera, BLUE);
+//          Renderer::drawLabel("X", {2.2f,0,0}, 25.f, camera, RED);
+//          Renderer::drawLabel("Y", {0,2.2f,0}, 25.f, camera, GREEN);
+//          Renderer::drawLabel("Z", {0,0,2.2f}, 25.f, camera, BLUE);
 
           auto &e = universe.getEntity("Earth");
-          Renderer::DrawLabel(e._name.c_str(), Vector3Add(e._pos, {0,e._radius + e._radius *.4f,0}), 35.f, camera, RAYWHITE);
+          Renderer::drawLabel(e._name.c_str(), Vector3Add(e._pos, {0,e._radius + e._radius *.4f,0}), 35.f, camera, RAYWHITE);
 
           auto &s = universe.getStar();
-          Renderer::DrawLabel(s._name.c_str(), Vector3Add(s._pos, {0,s._radius + s._radius *.2f,0}), 35.f, camera, RAYWHITE);
+          Renderer::drawLabel(s._name.c_str(), Vector3Add(s._pos, {0,s._radius + s._radius *.2f,0}), 35.f, camera, RAYWHITE);
 
           DrawText(std::to_string(GetFPS()).c_str(), 50, 30, 40, RAYWHITE);
 

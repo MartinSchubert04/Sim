@@ -3,7 +3,7 @@
 
 bool Renderer::SHOW_LETTER_BOUNDRY = false;
 
-void Renderer::DrawArrow(Vector3 startPos, Vector3 endPos, float radius, float coneLen, float sides, Color color) {
+void Renderer::drawArrow(Vector3 startPos, Vector3 endPos, float radius, float coneLen, float sides, Color color) {
 
   float coneStartRadius = radius * 3;
   Vector3 dir = Vector3Normalize(Vector3Subtract(endPos, startPos));
@@ -16,7 +16,7 @@ void Renderer::DrawArrow(Vector3 startPos, Vector3 endPos, float radius, float c
 }
 
 
-void Renderer::DrawText3D(Font font, const char *text, Vector3 position, float fontSize, float fontSpacing,
+void Renderer::drawText3D(Font font, const char *text, Vector3 position, float fontSize, float fontSpacing,
            float lineSpacing, bool backface, Color tint) {
   int length = TextLength(text);          // Total length in bytes of the text, scanned by codepoints in loop
 
@@ -42,7 +42,7 @@ void Renderer::DrawText3D(Font font, const char *text, Vector3 position, float f
       textOffsetX = 0.0f;
     } else {
       if ((codepoint != ' ') && (codepoint != '\t')) {
-        DrawTextCodepoint3D(font, codepoint, (Vector3) {position.x + textOffsetX, position.y,
+        drawTextCodepoint3D(font, codepoint, (Vector3) {position.x + textOffsetX, position.y,
                                                         position.z + textOffsetY}, fontSize,
                             backface, tint);
       }
@@ -57,7 +57,7 @@ void Renderer::DrawText3D(Font font, const char *text, Vector3 position, float f
   }
 }
 
-void Renderer::DrawTextCodepoint3D(Font font, int codepoint, Vector3 position, float fontSize, bool backface, Color tint) {
+void Renderer::drawTextCodepoint3D(Font font, int codepoint, Vector3 position, float fontSize, bool backface, Color tint) {
   // Character index position in sprite font
   // NOTE: In case a codepoint is not available in the font, index returned points to '?'
   int index = GetGlyphIndex(font, codepoint);
@@ -122,7 +122,7 @@ void Renderer::DrawTextCodepoint3D(Font font, int codepoint, Vector3 position, f
   }
 }
 
-void Renderer::DrawLabel(const char* text, Vector3 worldPos, float fontSize, Camera3D camera, Color color) {
+void Renderer::drawLabel(const char* text, Vector3 worldPos, float fontSize, Camera3D camera, Color color) {
   Vector2 screenPos = GetWorldToScreen(worldPos, camera);
 
   float textWidth = MeasureTextEx(Global::font, text, fontSize, 1).x;
@@ -130,4 +130,21 @@ void Renderer::DrawLabel(const char* text, Vector3 worldPos, float fontSize, Cam
   DrawTextEx(Global::font, text,
              {screenPos.x - textWidth / 2, screenPos.y},
              fontSize, 1, color);
+}
+
+void Renderer::drawGrid(Vector3 pos, int slices, float spacing, float arrowRadius, float coneLen) {
+  rlPushMatrix();
+    rlTranslatef(pos.x, pos.y,pos.z);
+    DrawGrid(slices, spacing);
+  rlPopMatrix();
+
+  float length = slices * spacing / 3;
+  // axis x = red, y = green, blue = z
+  drawArrow({pos.x, pos.y, pos.z}, {pos.x + length, pos.y, pos.z}, arrowRadius, coneLen, 8, RED);
+  drawArrow({pos.x, pos.y, pos.z}, {pos.x, pos.y + length, pos.z}, arrowRadius, coneLen, 8, GREEN);
+  drawArrow({pos.x, pos.y, pos.z}, {pos.x, pos.y, pos.z + length}, arrowRadius, coneLen, 8, BLUE);
+
+//  drawLabel("X", {2.2f,0,0}, 25.f,camera, RED);
+//  drawLabel("Y", {0,2.2f,0}, 25.f, camera, GREEN);
+//  drawLabel("Z", {0,0,2.2f}, 25.f, camera, BLUE);
 }

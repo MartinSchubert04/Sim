@@ -1,8 +1,7 @@
 #include "CameraController.h"
 
 void CameraController::update(Camera3D &camera) {
-  if (_planetFocus != nullptr)
-    camera.target = _planetFocus->_pos;
+  handleCameraTarget(camera);
 
   int touches = GetTouchPointCount();
   TouchState state = touches == 0 ? TouchState::Idle
@@ -10,7 +9,7 @@ void CameraController::update(Camera3D &camera) {
                                   : TouchState::Zooming;
 
   if (state != _lastState && state == TouchState::Orbiting) {
-    handlePlanetSelection(camera);  // solo en el primer frame de touch
+    handlePlanetSelection(camera);
   }
 
   switch (state) {
@@ -77,8 +76,6 @@ void CameraController::handleZoom(Camera3D &camera) {
 }
 
 void CameraController::handlePlanetSelection(Camera3D &camera) {
-  Vector2 touch = getTouch();
-
   Ray  ray = GetScreenToWorldRay(getTouch(), camera);
 
   for (auto &e : Universe::getEntities()) {
@@ -96,3 +93,15 @@ void CameraController::handlePlanetSelection(Camera3D &camera) {
   }
 }
 
+void CameraController::handleCameraTarget(Camera3D &camera) {
+  if (!_planetFocus) return;
+
+  float speed = 0.07f;
+  float targetDist = _planetFocus->_radius * 8.f;
+  float currentDist = Vector3Distance(camera.position, _planetFocus->_pos);
+
+  camera.target = Vector3Lerp(camera.target, _planetFocus->_pos, speed);
+  Vector3 dir = Vector3Normalize(Vector3Subtract(camera.position, _planetFocus->_pos));
+  float newDist = Lerp(currentDist, targetDist, speed);
+  camera.position = Vector3Add(_planetFocus->_pos, Vector3Scale(dir, newDist));
+}

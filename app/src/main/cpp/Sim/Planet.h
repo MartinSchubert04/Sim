@@ -27,9 +27,9 @@ private:
     void orbit(DeltaTime dt);
 
 private:
-
     Model _model;
     Material _material;
+    Shader _shader;
     float _rotationAngle = 0.f;
-
+    std::vector<Ref<Texture>> _textures;
 };

@@ -28,7 +28,6 @@ public:
 private:
   void updateOrbits(DeltaTime dt);
 
-
 private:
   static std::vector<Planet> entities;
   static Planet sun;

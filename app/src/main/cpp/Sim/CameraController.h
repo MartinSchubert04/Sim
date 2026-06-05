@@ -16,6 +16,7 @@ private:
     void handleMovement(Camera3D &camera);
     void handleZoom(Camera3D &camera);
     void handlePlanetSelection(Camera3D &camera);
+    void handleCameraTarget(Camera3D &camera);
     Vector2 getTouchDelta();
     Vector2 getTouch();
 
