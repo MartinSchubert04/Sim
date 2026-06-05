@@ -66,6 +66,15 @@ void Application::run() {
         dt = time - _lastTime;
         _lastTime = time;
 
+        if (GetScreenOrientation() == ORIENTATION_LANDSCAPE || GetScreenOrientation() == ORIENTATION_LANDSCAPE_REVERSED) {
+            _window = {(float)GetScreenWidth(), (float)GetScreenHeight()};
+          float aspect = _window.x / _window.y;
+          camera.fovy = 45.0f;  // este es el fov vertical
+          // si querés mantener el fov horizontal constante:
+          camera.fovy = RAD2DEG * 2.0f * atanf(tanf(DEG2RAD * 45.0f / 2.0f) / aspect);
+
+        }
+
         BeginDrawing();
           ClearBackground(BLACK);
           BeginMode3D(camera);
