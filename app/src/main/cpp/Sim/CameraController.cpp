@@ -48,9 +48,13 @@ void CameraController::handleMovement(Camera3D &camera) {
 
     offset = Vector3RotateByAxisAngle(offset, {0, 1, 0}, -angleH);
 
-    Vector3 right = Vector3CrossProduct(offset, camera.up);
-    right = Vector3Normalize(right);
-    offset = Vector3RotateByAxisAngle(offset, right, angleV);
+    Vector3 right     = Vector3Normalize(Vector3CrossProduct(offset, camera.up));
+    Vector3 candidate = Vector3RotateByAxisAngle(offset, right, angleV);
+
+    // solo aceptar si el candidato no supera ~85° del polo (evita el flip)
+    float polarCos = fabsf(Vector3DotProduct(Vector3Normalize(candidate), {0, 1, 0}));
+    if (polarCos < 0.996f)
+      offset = candidate;
 
     camera.position = Vector3Add(camera.target, offset);
   }
@@ -70,6 +74,9 @@ void CameraController::handleZoom(Camera3D &camera) {
     // Mover la cámara hacia/desde el target
     Vector3 dir = Vector3Normalize(Vector3Subtract(camera.position, camera.target));
     camera.position = Vector3Add(camera.position, Vector3Scale(dir, -delta * zoomScale));
+
+    if (_planetFocus)
+      _customDist = Vector3Distance(camera.position, camera.target);
   }
 
   _lastPinchDist = dist;
@@ -82,6 +89,8 @@ void CameraController::handlePlanetSelection(Camera3D &camera) {
       auto collision = GetRayCollisionSphere(ray, e->_pos, e->_radius);
       if(collision.hit) {
         _planetFocus = e;
+        _arrived = false;
+        _customDist = 0.f;
         return;
       }
   }
@@ -90,20 +99,31 @@ void CameraController::handlePlanetSelection(Camera3D &camera) {
   RayCollision colSun = GetRayCollisionSphere(ray, Universe::getStar()->_pos, Universe::getStar()->_radius);
   if (colSun.hit) {
     _planetFocus = Universe::getStar();
+    _arrived = false;
+    _customDist = 0.f;
   }
 }
 
 void CameraController::handleCameraTarget(Camera3D &camera) {
   if (!_planetFocus) return;
 
-  if (_planetFocus->_radius * 8.f);
+  if (_arrived) {
+    camera.target = _planetFocus->_pos;  // solo seguir, no tocar position
+    return;
+  }
 
   float speed = 0.07f;
-  float targetDist = _planetFocus->_radius * 8.f;
+  float targetDist = _customDist > 0.f ? _customDist
+                                       : _planetFocus->_radius * 8.f;
+
   float currentDist = Vector3Distance(camera.position, _planetFocus->_pos);
 
-  if(abs(targetDist) == abs(currentDist))
+  if (fabsf(currentDist - targetDist) < 0.05f &&
+      Vector3Distance(camera.target, _planetFocus->_pos) < 0.05f) {
+    _arrived = true;
     camera.target = _planetFocus->_pos;
+    return;
+  }
 
   camera.target = Vector3Lerp(camera.target, _planetFocus->_pos, speed);
   Vector3 dir = Vector3Normalize(Vector3Subtract(camera.position, _planetFocus->_pos));

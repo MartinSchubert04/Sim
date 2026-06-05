@@ -27,4 +27,6 @@ private:
     float _lastPinchDist;
     Ref<Planet> _planetFocus = nullptr;
     TouchState _lastState = TouchState::Idle;
+    bool _arrived = false;
+    float _customDist;
 };
