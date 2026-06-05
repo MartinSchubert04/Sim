@@ -1,14 +1,27 @@
 #include "Planet.h"
 
-Planet::Planet(std::string name, Vector3 pos, float radius, float mass, Texture texture, Color color)
-                      :  _name(name), _pos(pos), _radius(radius), _mass(mass), _color(color), _speed({0,0,0}) {
+Planet::Planet(std::string name, Vector3 pos, float radius, float mass, std::vector<Texture> textures, bool isStar)
+                      :  _name(name), _pos(pos), _radius(radius), _mass(mass), _speed({0,0,0}), _isStar(isStar) {
+
+  _shader = LoadShader("shaders/planet.vs", "shaders/planet.fs");
 
   Mesh mesh = GenMeshSphere(_radius, 32, 32);
   _model = LoadModelFromMesh(mesh);
-  _material = LoadMaterialDefault();
-  _material.maps[MATERIAL_MAP_DIFFUSE].color = _color;
-  _material.maps[MATERIAL_MAP_DIFFUSE].texture = texture;
-  SetMaterialTexture(&_model.materials[0], MATERIAL_MAP_DIFFUSE, texture);
+
+  SetMaterialTexture(&_model.materials[0], MATERIAL_MAP_DIFFUSE, textures[0]);
+  if (textures.size() > 1 && textures[1].id > 0)
+      SetMaterialTexture(&_model.materials[0], MATERIAL_MAP_SPECULAR, textures[1]);
+  if (textures.size() > 2 && textures[2].id > 0)
+      SetMaterialTexture(&_model.materials[0], MATERIAL_MAP_NORMAL, textures[2]);
+
+  _model.materials[0].shader = _shader;
+
+  _lightPosLoc = GetShaderLocation(_shader, "lightPos");
+  _camPosLoc   = GetShaderLocation(_shader, "camPos");
+  _isStarLoc   = GetShaderLocation(_shader, "isStar");
+
+  float isStarVal = _isStar ? 1.f : 0.f;
+  SetShaderValue(_shader, _isStarLoc, &isStarVal, SHADER_UNIFORM_FLOAT);
 
   Matrix correction = MatrixRotateX(DEG2RAD * -90.0f);
   _model.transform = correction;
@@ -33,8 +46,10 @@ void Planet::update(DeltaTime dt) {
 //  orbit(dt);
 }
 
-void Planet::draw() {
-  DrawModel(_model, _pos, 1.f, _color);
+void Planet::draw(Vector3 lightPos, Vector3 camPos) {
+  SetShaderValue(_shader, _lightPosLoc, &lightPos, SHADER_UNIFORM_VEC3);
+  SetShaderValue(_shader, _camPosLoc,   &camPos,   SHADER_UNIFORM_VEC3);
+  DrawModel(_model, _pos, 1.f, WHITE);
 }
 
 void Planet::orbit(DeltaTime dt) {

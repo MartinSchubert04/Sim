@@ -2,8 +2,11 @@
 
 #include "raymob.h"
 #include "raymath.h"
+#include "rlgl.h"
 #include <cstdint>
 #include <random>
+#include <unordered_map>
+#include <unordered_set>
 
 using int8_t = int8_t;
 using int16_t = int16_t;

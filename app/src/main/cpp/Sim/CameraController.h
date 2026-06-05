@@ -25,6 +25,6 @@ private:
     Vector2 _lastPos = {0.f, 0.f};
     b32 _touching = false;
     float _lastPinchDist;
-    Planet *_planetFocus = nullptr;
+    Ref<Planet> _planetFocus = nullptr;
     TouchState _lastState = TouchState::Idle;
 };

@@ -79,26 +79,31 @@ void CameraController::handlePlanetSelection(Camera3D &camera) {
   Ray  ray = GetScreenToWorldRay(getTouch(), camera);
 
   for (auto &e : Universe::getEntities()) {
-      auto collision = GetRayCollisionSphere(ray, e._pos, e._radius);
+      auto collision = GetRayCollisionSphere(ray, e->_pos, e->_radius);
       if(collision.hit) {
-        _planetFocus = &e;
+        _planetFocus = e;
         return;
       }
   }
 
   // check for sun
-  RayCollision colSun = GetRayCollisionSphere(ray, Universe::getStar()._pos, Universe::getStar()._radius);
+  RayCollision colSun = GetRayCollisionSphere(ray, Universe::getStar()->_pos, Universe::getStar()->_radius);
   if (colSun.hit) {
-    _planetFocus = &Universe::getStar();
+    _planetFocus = Universe::getStar();
   }
 }
 
 void CameraController::handleCameraTarget(Camera3D &camera) {
   if (!_planetFocus) return;
 
+  if (_planetFocus->_radius * 8.f);
+
   float speed = 0.07f;
   float targetDist = _planetFocus->_radius * 8.f;
   float currentDist = Vector3Distance(camera.position, _planetFocus->_pos);
+
+  if(abs(targetDist) == abs(currentDist))
+    camera.target = _planetFocus->_pos;
 
   camera.target = Vector3Lerp(camera.target, _planetFocus->_pos, speed);
   Vector3 dir = Vector3Normalize(Vector3Subtract(camera.position, _planetFocus->_pos));
